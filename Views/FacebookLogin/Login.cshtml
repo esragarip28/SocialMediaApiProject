@@ -1,0 +1,82 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <h1 id="hh">Hello Silence !!!</h1>
+    <fb:login-button scope="public_profile,email"
+                     onlogin="checkLoginState();">
+    </fb:login-button>
+    <div id="authStatus"></div>
+
+    <script>
+
+        var user = { userId: "", accessToken: "" , expiresIn: "" , dataAccessExpirationTime: "" , isActive: "" , foreignKeyId: "" };
+
+        window.fbAsyncInit = function () {
+
+            FB.init({
+                appId: '881418686127166',
+                cookie: true,
+                xfbml: true,
+                version: 'v11.0'
+            });
+
+            FB.AppEvents.logPageView();
+
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        var val1 = '@ViewBag.userId';
+        
+        //url: 'Url.Action("AddAccessTokenInfoToDb", " FacebookLogin")',
+
+        function checkLoginState() {
+            FB.getLoginStatus(function (response) {
+            $("#authStatus").html("<code>" + JSON.stringify(response, null, 2) + "</code>")
+                if (response.status === 'connected') {
+                    user.userId = response.authResponse.userID;
+                    user.accessToken = response.authResponse.accessToken;
+                    user.expiresIn = response.authResponse.expiresIn;
+                    user.dataAccessExpirationTime = response.authResponse.data_access_expiration_time;
+                    user.isActive ="active";
+                    user.foreignKeyId =val1;
+
+                     //url: "https ://localhost:44325/FacebookLogin/AddAccessTokenInfoToDb ",
+                    console.log(user);
+
+                    $.ajax({
+                            url: '@Url.Action("AddAccessTokenInfoToDb", "FacebookLogin")',
+                            dataType: 'json',
+                            method: "POST",
+                            data: JSON.stringify(user),
+                         contentType: 'application/json; charset=UTF-8',
+
+                    });
+
+                }
+                    //window.location.replace("https://localhost:44325/FacebookLogin?info=" + response.authResponse.accessToken);
+
+            });
+        }
+
+
+    </script>
+
+</body>
+
+</html>
